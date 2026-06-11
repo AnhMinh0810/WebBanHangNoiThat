@@ -1,0 +1,91 @@
+@model furniture_store.Models.HomeViewModel
+
+@{
+    ViewData["Title"] = "Không Gian Sống Đẳng Cấp";
+}
+
+<!-- Hero Banner -->
+<section class="hero-section">
+    <div class="hero-container">
+        <span class="hero-tag">✨ THƯƠNG HIỆU NỘI THẤT CAO CẤP</span>
+        <h1 class="hero-title">Không Gian Sống<br/>Đẳng Cấp Của Bạn</h1>
+        <p class="hero-description">
+            Khám phá bộ sưu tập nội thất sang trọng, được lựa chọn kỹ lưỡng từ các thương hiệu hàng đầu thế giới.
+        </p>
+        <div class="hero-actions">
+            <a href="/Products" class="btn-luxe btn-luxe-primary">Khám Phá Ngay</a>
+            <a href="/Products?category=phong-khach" class="btn-luxe btn-luxe-outline">Phòng Khách</a>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="luxe-section">
+    <div class="section-title-wrapper">
+        <h2 class="section-title">Danh Mục Sản Phẩm</h2>
+        <p class="section-subtitle">Tìm kiếm theo không gian phù hợp với ngôi nhà của bạn</p>
+    </div>
+    
+    <div class="categories-grid">
+        @foreach (var cat in Model.Categories)
+        {
+            <a href="/Products?category=@cat.Slug" class="category-card">
+                <img src="@cat.ImageUrl" alt="@cat.Name" class="category-img" onerror="this.onerror=null; this.src='/images/hero_sofa.png';" />
+                <div class="category-overlay">
+                    <h3 class="category-name">@cat.Name</h3>
+                </div>
+            </a>
+        }
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="luxe-section">
+    <div class="section-title-wrapper">
+        <h2 class="section-title">Sản Phẩm Nổi Bật</h2>
+        <p class="section-subtitle">Những sản phẩm được yêu thích nhất của Nội Thất LUXE</p>
+    </div>
+    
+    <div class="products-grid">
+        @foreach (var item in Model.FeaturedProducts)
+        {
+            <div class="product-card">
+                <div class="product-img-wrapper">
+                    <span class="product-badge">Nổi bật</span>
+                    <img src="@item.ImageUrl" alt="@item.Name" class="product-img" onerror="this.onerror=null; this.src='/images/hero_sofa.png';" />
+                </div>
+                <div class="product-info">
+                    <span class="product-category">@(item.Category != null ? item.Category.Name : "Nội Thất")</span>
+                    <h3 class="product-title">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Id">@item.Name</a>
+                    </h3>
+                    <div class="product-price">@item.Price.ToString("N0") ₫</div>
+                    <div class="product-actions">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Id" class="btn-luxe btn-luxe-outline text-center py-2" style="font-size: 0.75rem; padding: 8px 12px;">Xem Chi Tiết</a>
+                        <form asp-controller="Cart" asp-action="Add" method="post" style="display: inline;">
+                            <input type="hidden" name="productId" value="@item.Id" />
+                            <button type="submit" class="btn-add-cart" title="Thêm vào giỏ">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    
+    <div class="text-center mt-5">
+        <a href="/Products" class="btn-luxe btn-luxe-outline px-5 py-3">Xem Tất Cả Sản Phẩm</a>
+    </div>
+</section>
+
+<!-- Shipping Banner Section -->
+<section class="luxe-section">
+    <div class="shipping-banner">
+        <h2 class="shipping-title">Giao Hàng Miễn Phí Toàn Quốc</h2>
+        <p class="shipping-sub">
+            Cho đơn hàng từ 5.000.000 đ trở lên - Lắp đặt tận nơi - Bảo hành 24 tháng
+        </p>
+        <a href="/Products" class="btn-luxe btn-luxe-primary px-5 py-3">MUA NGAY</a>
+    </div>
+</section>

@@ -1,0 +1,112 @@
+@model furniture_store.Models.Order
+
+@{
+    ViewData["Title"] = "Đặt Hàng Thành Công";
+    
+    // Map payment method code to user-friendly label
+    string paymentMethodText = Model.PaymentMethod switch
+    {
+        "cod" => "💵 Tiền mặt (COD)",
+        "bank" => "🏦 Chuyển khoản",
+        "momo" => "📱 Ví MoMo",
+        _ => Model.PaymentMethod ?? "💵 Tiền mặt (COD)"
+    };
+}
+
+<div class="container mt-5 mb-5 d-flex justify-content-center" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+    <div class="luxe-card text-center" style="max-width: 600px; width: 100%; padding: 48px 32px; border-radius: var(--radius-lg); box-shadow: 0 15px 40px rgba(0,0,0,0.05);">
+        
+        <!-- Confetti Icon -->
+        <div class="d-flex justify-content-center">
+            <svg viewBox="0 0 100 100" width="100" height="100" class="mb-4">
+                <!-- Popper Cone -->
+                <path d="M42 68 L68 42 L48 32 Z" fill="#F1C40F" />
+                <path d="M32 78 L68 42 L42 68 Z" fill="#D35400" />
+                <path d="M48 32 C 38 32, 28 42, 32 78 Z" fill="#3498DB" />
+                
+                <!-- Confetti Streamers -->
+                <path d="M68 32 Q 78 22, 68 12" fill="none" stroke="#E74C3C" stroke-width="3" stroke-linecap="round" />
+                <path d="M78 42 Q 90 37, 95 47" fill="none" stroke="#9B59B6" stroke-width="3" stroke-linecap="round" />
+                <path d="M52 22 Q 47 7, 57 2" fill="none" stroke="#2ECC71" stroke-width="3" stroke-linecap="round" />
+                
+                <!-- Confetti Dots & Stars -->
+                <circle cx="78" cy="20" r="4" fill="#F1C40F" />
+                <circle cx="88" cy="30" r="3" fill="#E74C3C" />
+                <circle cx="58" cy="4" r="4.5" fill="#3498DB" />
+                <circle cx="48" cy="14" r="3" fill="#9B59B6" />
+                <circle cx="92" cy="14" r="4" fill="#2ECC71" />
+                <circle cx="68" cy="52" r="3.5" fill="#E67E22" />
+            </svg>
+        </div>
+
+        <!-- Success Message -->
+        <h1 class="font-serif mb-3" style="color: var(--color-primary); font-size: 2.2rem; font-weight: 700;">Đặt Hàng Thành Công!</h1>
+        <p class="text-muted mb-5" style="max-width: 480px; margin: 0 auto; font-size: 0.95rem; line-height: 1.6;">
+            Cảm ơn bạn đã mua hàng tại <strong>Nội Thất LUXE</strong>.<br />
+            Chúng tôi sẽ liên hệ xác nhận đơn hàng trong thời gian sớm nhất.
+        </p>
+
+        <!-- Order Detail Card -->
+        <div style="background-color: var(--color-surface-low); border: 1px solid var(--color-outline-variant); border-radius: var(--radius-md); padding: 24px; text-align: left; margin-bottom: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Order ID -->
+                <div class="d-flex justify-content-between" style="border-bottom: 1px dashed var(--color-outline-variant); padding-bottom: 8px;">
+                    <span class="text-muted" style="font-size: 0.9rem;">Mã đơn hàng</span>
+                    <strong style="color: var(--color-on-surface); font-size: 0.95rem;">#@Model.Id.ToString("D5")</strong>
+                </div>
+
+                <!-- Customer Name -->
+                <div class="d-flex justify-content-between" style="border-bottom: 1px dashed var(--color-outline-variant); padding-bottom: 8px;">
+                    <span class="text-muted" style="font-size: 0.9rem;">Khách hàng</span>
+                    <strong style="color: var(--color-on-surface); font-size: 0.95rem;">@Model.CustomerName</strong>
+                </div>
+
+                <!-- Customer Phone -->
+                <div class="d-flex justify-content-between" style="border-bottom: 1px dashed var(--color-outline-variant); padding-bottom: 8px;">
+                    <span class="text-muted" style="font-size: 0.9rem;">Điện thoại</span>
+                    <strong style="color: var(--color-on-surface); font-size: 0.95rem;">@Model.CustomerPhone</strong>
+                </div>
+
+                <!-- Address -->
+                <div class="d-flex justify-content-between" style="border-bottom: 1px dashed var(--color-outline-variant); padding-bottom: 8px;">
+                    <span class="text-muted" style="font-size: 0.9rem;">Địa chỉ</span>
+                    <strong style="color: var(--color-on-surface); font-size: 0.95rem; text-align: right; max-width: 320px;">@Model.Address</strong>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="d-flex justify-content-between" style="border-bottom: 1px dashed var(--color-outline-variant); padding-bottom: 8px;">
+                    <span class="text-muted" style="font-size: 0.9rem;">Thanh toán</span>
+                    <strong style="color: var(--color-on-surface); font-size: 0.95rem;">@paymentMethodText</strong>
+                </div>
+
+                <!-- Items list -->
+                <div style="border-bottom: 1px solid var(--color-outline-variant); padding: 8px 0; margin-top: 4px;">
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <div class="d-flex justify-content-between" style="padding: 4px 0; font-size: 0.9rem;">
+                            <span style="color: var(--color-on-surface); font-weight: 500;">@item.ProductName <span style="color: var(--color-outline);">× @item.Quantity</span></span>
+                            <span class="text-gold font-weight-bold">@((item.Price * item.Quantity).ToString("N0")) ₫</span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Total Sum -->
+                <div class="d-flex justify-content-between pt-2">
+                    <span style="font-weight: 700; color: var(--color-on-surface); font-size: 1rem;">Tổng tiền</span>
+                    <span class="text-gold font-weight-bold" style="font-size: 1.25rem;">@Model.Total.ToString("N0") ₫</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Redirect buttons -->
+        <div class="d-flex justify-content-center gap-3 align-items-center flex-wrap">
+            <a href="/" class="btn-luxe btn-luxe-outline d-flex align-items-center gap-2" style="padding: 12px 28px; font-size: 0.85rem; font-weight: 600;">
+                🏠 Về Trang Chủ
+            </a>
+            <a href="/Products" class="btn-luxe btn-luxe-primary d-flex align-items-center gap-2" style="padding: 12px 32px; font-size: 0.85rem; font-weight: 600; background-color: var(--color-primary-container);">
+                🛍️ Tiếp Tục Mua Sắm
+            </a>
+        </div>
+
+    </div>
+</div>

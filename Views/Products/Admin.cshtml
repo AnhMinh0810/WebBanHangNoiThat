@@ -1,0 +1,344 @@
+@model IEnumerable<furniture_store.Models.Product>
+
+@{
+    ViewData["Title"] = "Quản Lý Sản Phẩm";
+    var categories = ViewData["Categories"] as List<furniture_store.Models.Category> ?? new List<furniture_store.Models.Category>();
+}
+
+<div class="container mt-5 mb-5">
+    
+    <!-- Admin Header -->
+    <div class="page-header align-items-center">
+        <div>
+            <h1 class="page-title d-flex align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary); margin-right: 12px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Quản Lý Sản Phẩm
+            </h1>
+            <p class="page-subtitle">Tổng: @Model.Count() sản phẩm</p>
+        </div>
+        <div>
+            <button type="button" class="btn-luxe btn-luxe-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Thêm Sản Phẩm
+            </button>
+        </div>
+    </div>
+
+    <!-- Product Table -->
+    <div class="luxe-card p-0 overflow-hidden" style="border-radius: var(--radius-lg);">
+        <table class="table mb-0 align-middle" style="border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #1c1c18; color: #ffffff;">
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; width: 80px;">Ảnh</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">Tên Sản Phẩm</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">Danh Mục</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">Giá</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">Tồn Kho</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">Nổi Bật</th>
+                    <th class="py-3 px-4 text-center" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; width: 220px;">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr style="border-bottom: 1px solid var(--color-surface-container);">
+                        <td class="py-3 px-4">
+                            <img src="@item.ImageUrl" alt="@item.Name" style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--color-outline-variant);" onerror="this.onerror=null; this.src='/images/hero_sofa.png';" />
+                        </td>
+                        <td class="py-3 px-4" style="font-weight: 600; color: var(--color-on-surface);">@item.Name</td>
+                        <td class="py-3 px-4" style="color: var(--color-on-surface-variant);">@(item.Category != null ? item.Category.Name : "Nội Thất")</td>
+                        <td class="py-3 px-4 text-gold font-weight-bold">@item.Price.ToString("N0") ₫</td>
+                        <td class="py-3 px-4 font-weight-bold" style="color: var(--color-success);">@item.Stock</td>
+                        <td class="py-3 px-4">
+                            @if (item.Featured == true)
+                            {
+                                <span class="text-gold" style="font-weight: 600;">★ Yes</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="button" class="btn-luxe btn-luxe-outline py-2 px-3 btn-edit" 
+                                        style="font-size: 0.75rem; padding: 6px 12px;"
+                                        data-id="@item.Id"
+                                        data-name="@item.Name"
+                                        data-price="@item.Price"
+                                        data-category="@item.CategoryId"
+                                        data-stock="@item.Stock"
+                                        data-imageurl="@item.ImageUrl"
+                                        data-description="@item.Description"
+                                        data-featured="@(item.Featured == true ? "true" : "false")"
+                                        data-createdat="@item.CreatedAt">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                    Sửa
+                                </button>
+                                <button type="button" class="btn-luxe py-2 px-3 btn-delete" 
+                                        style="background-color: var(--color-error); border: 1px solid var(--color-error); color: white; font-size: 0.75rem; padding: 6px 12px;"
+                                        data-id="@item.Id"
+                                        data-name="@item.Name">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                    Xóa
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: THÊM SẢN PHẨM MỚI -->
+<!-- ========================================== -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 p-4" style="border-radius: var(--radius-xl); background-color: #ffffff; box-shadow: 0 24px 48px rgba(0,0,0,0.15);">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                <h3 class="font-serif m-0" style="font-size: 1.8rem;">Thêm Sản Phẩm Mới</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: none; border: none; font-size: 1.5rem; line-height: 1; color: var(--color-outline); cursor: pointer;">&times;</button>
+            </div>
+            
+            <form id="createForm" asp-controller="Products" asp-action="Create" method="post">
+                <input type="hidden" name="Slug" id="createProductSlug" />
+                
+                <div class="modal-body pt-4">
+                    <div class="row">
+                        <div class="col-md-6 form-group-luxe">
+                            <label class="form-label-luxe">Tên sản phẩm *</label>
+                            <input type="text" name="Name" id="createProductName" class="form-control-luxe" placeholder="VD: Sofa 3 chỗ" required />
+                        </div>
+                        <div class="col-md-6 form-group-luxe">
+                            <label class="form-label-luxe">Giá (đ) *</label>
+                            <input type="number" name="Price" class="form-control-luxe" placeholder="5000000" required />
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6 form-group-luxe">
+                            <label class="form-label-luxe">Danh mục</label>
+                            <select name="CategoryId" class="form-control-luxe" style="background-color: white;">
+                                <option value="">-- Chọn danh mục --</option>
+                                @foreach (var cat in categories)
+                                {
+                                    <option value="@cat.Id">@cat.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group-luxe">
+                            <label class="form-label-luxe">Tồn kho</label>
+                            <input type="number" name="Stock" class="form-control-luxe" placeholder="10" defaultValue="0" />
+                        </div>
+                    </div>
+
+                    <div class="form-group-luxe mt-3">
+                        <label class="form-label-luxe">URL Ảnh</label>
+                        <input type="text" name="ImageUrl" class="form-control-luxe" placeholder="https://..." />
+                    </div>
+
+                    <div class="form-group-luxe mt-3">
+                        <label class="form-label-luxe">Mô tả</label>
+                        <textarea name="Description" class="form-control-luxe" rows="4" placeholder="Mô tả sản phẩm..." style="resize: vertical;"></textarea>
+                    </div>
+
+                    <div class="form-group-luxe mt-3">
+                        <label class="checkbox-luxe">
+                            <input type="checkbox" name="Featured" value="true" />
+                            <span class="form-label-luxe m-0" style="display: inline-block;">Sản phẩm nổi bật</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer border-0 pt-3 d-flex justify-content-end gap-3">
+                    <button type="button" class="btn-luxe btn-luxe-outline" data-bs-dismiss="modal" style="padding: 10px 28px;">Hủy</button>
+                    <button type="submit" class="btn-luxe btn-luxe-primary" style="padding: 10px 28px; background-color: var(--color-primary-container);">Lưu Sản Phẩm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: CHỈNH SỬA SẢN PHẨM -->
+<!-- ========================================== -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 p-4" style="border-radius: var(--radius-xl); background-color: #ffffff; box-shadow: 0 24px 48px rgba(0,0,0,0.15);">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                <h3 class="font-serif m-0" style="font-size: 1.8rem;">Chỉnh Sửa Sản Phẩm</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: none; border: none; font-size: 1.5rem; line-height: 1; color: var(--color-outline); cursor: pointer;">&times;</button>
+            </div>
+            
+            <form id="editForm" method="post" asp-controller="Products" asp-action="Edit">
+                <input type="hidden" name="Id" id="editProductId" />
+                <input type="hidden" name="CreatedAt" id="editProductCreatedAt" />
+                <input type="hidden" name="Slug" id="editProductSlug" />
+                
+                <div class="modal-body pt-4">
+                    <div class="row">
+                        <div class="col-md-6 form-group-luxe">
+                            <label class="form-label-luxe">Tên sản phẩm *</label>
+                            <input type="text" name="Name" id="editProductName" class="form-control-luxe" required />
+                        </div>
+                        <div class="col-md-6 form-group-luxe">
+                            <label class="form-label-luxe">Giá (đ) *</label>
+                            <input type="number" name="Price" id="editProductPrice" class="form-control-luxe" required />
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6 form-group-luxe">
+                            <label class="form-label-luxe">Danh mục</label>
+                            <select name="CategoryId" id="editProductCategory" class="form-control-luxe" style="background-color: white;">
+                                <option value="">-- Chọn danh mục --</option>
+                                @foreach (var cat in categories)
+                                {
+                                    <option value="@cat.Id">@cat.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group-luxe">
+                            <label class="form-label-luxe">Tồn kho</label>
+                            <input type="number" name="Stock" id="editProductStock" class="form-control-luxe" />
+                        </div>
+                    </div>
+
+                    <div class="form-group-luxe mt-3">
+                        <label class="form-label-luxe">URL Ảnh</label>
+                        <input type="text" name="ImageUrl" id="editProductImageUrl" class="form-control-luxe" />
+                    </div>
+
+                    <div class="form-group-luxe mt-3">
+                        <label class="form-label-luxe">Mô tả</label>
+                        <textarea name="Description" id="editProductDescription" class="form-control-luxe" rows="4" style="resize: vertical;"></textarea>
+                    </div>
+
+                    <div class="form-group-luxe mt-3">
+                        <label class="checkbox-luxe">
+                            <input type="checkbox" name="Featured" id="editProductFeatured" value="true" />
+                            <span class="form-label-luxe m-0" style="display: inline-block;">Sản phẩm nổi bật</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer border-0 pt-3 d-flex justify-content-end gap-3">
+                    <button type="button" class="btn-luxe btn-luxe-outline" data-bs-dismiss="modal" style="padding: 10px 28px;">Hủy</button>
+                    <button type="submit" class="btn-luxe btn-luxe-primary" style="padding: 10px 28px; background-color: var(--color-primary-container);">Cập Nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: XÓA SẢN PHẨM (XÁC NHẬN) -->
+<!-- ========================================== -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 p-4" style="border-radius: var(--radius-xl); background-color: #ffffff; box-shadow: 0 24px 48px rgba(0,0,0,0.15);">
+            <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                <h3 class="font-serif m-0 text-danger-luxe" style="font-size: 1.6rem;">Xác Nhận Xóa</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: none; border: none; font-size: 1.5rem; line-height: 1; color: var(--color-outline); cursor: pointer;">&times;</button>
+            </div>
+            
+            <form id="deleteForm" method="post" asp-controller="Products" asp-action="Delete">
+                <div class="modal-body pt-3">
+                    <p class="text-muted">Bạn có chắc chắn muốn xóa sản phẩm <strong id="deleteProductNameText" class="text-charcoal"></strong> không? Hành động này không thể hoàn tác.</p>
+                </div>
+                
+                <div class="modal-footer border-0 pt-3 d-flex justify-content-end gap-3">
+                    <button type="button" class="btn-luxe btn-luxe-outline" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn-luxe" style="background-color: var(--color-error); border: 1px solid var(--color-error); color: white;">Xóa Sản Phẩm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Automatic Slug Generator function
+        function slugify(text) {
+            return text.toString().toLowerCase()
+                .replace(/á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/g, 'a')
+                .replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/g, 'e')
+                .replace(/í|ì|ỉ|ĩ|ị/g, 'i')
+                .replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/g, 'o')
+                .replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/g, 'u')
+                .replace(/ý|ỳ|ỷ|ỹ|ỵ/g, 'y')
+                .replace(/đ/g, 'd')
+                .replace(/[^a-z0-9 -]/g, '') 
+                .replace(/\s+/g, '-')           
+                .replace(/-+/g, '-');          
+        }
+
+        $(function() {
+            // Automatic slug for create form
+            $('#createProductName').on('input', function() {
+                $('#createProductSlug').val(slugify($(this).val()));
+            });
+
+            // Automatic slug for edit form
+            $('#editProductName').on('input', function() {
+                $('#editProductSlug').val(slugify($(this).val()));
+            });
+
+            // Populate EDIT Modal fields on button click
+            $('.btn-edit').on('click', function() {
+                var id = $(this).data('id');
+                var name = $(this).data('name');
+                var price = $(this).data('price');
+                var category = $(this).data('category');
+                var stock = $(this).data('stock');
+                var imageurl = $(this).data('imageurl');
+                var description = $(this).data('description');
+                var featured = $(this).data('featured');
+                var createdat = $(this).data('createdat');
+
+                // Set values to inputs
+                $('#editProductId').val(id);
+                $('#editProductName').val(name);
+                $('#editProductPrice').val(price);
+                $('#editProductCategory').val(category);
+                $('#editProductStock').val(stock);
+                $('#editProductImageUrl').val(imageurl);
+                $('#editProductDescription').val(description);
+                $('#editProductCreatedAt').val(createdat);
+                $('#editProductSlug').val(slugify(name));
+                
+                // Set checkbox status
+                if (featured === true || featured === "true") {
+                    $('#editProductFeatured').prop('checked', true);
+                } else {
+                    $('#editProductFeatured').prop('checked', false);
+                }
+
+                // Update form submit action route
+                $('#editForm').attr('action', '/Products/Edit/' + id);
+
+                // Open modal
+                var editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                editModal.show();
+            });
+
+            // Populate DELETE Modal fields on button click
+            $('.btn-delete').on('click', function() {
+                var id = $(this).data('id');
+                var name = $(this).data('name');
+
+                $('#deleteProductNameText').text(name);
+                $('#deleteForm').attr('action', '/Products/Delete/' + id);
+
+                var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                deleteModal.show();
+            });
+        });
+    </script>
+}

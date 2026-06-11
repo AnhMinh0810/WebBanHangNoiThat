@@ -1,0 +1,176 @@
+@{
+    int cartCount = 0;
+    var LuxeCartCookie = Context.Request.Cookies["luxe_cart"];
+    if (!string.IsNullOrEmpty(LuxeCartCookie))
+    {
+        try
+        {
+            var cartItems = System.Text.Json.JsonSerializer.Deserialize<List<furniture_store.Models.CartItem>>(LuxeCartCookie);
+            if (cartItems != null)
+            {
+                cartCount = cartItems.Sum(i => i.Quantity);
+            }
+        }
+        catch { }
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Nội Thất LUXE</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/furniture_store.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="luxe-header">
+        <nav class="luxe-navbar">
+            <a class="luxe-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <span class="luxe-brand-sub">Nội Thất</span>
+                <span class="luxe-brand-main">LUXE</span>
+            </a>
+            
+            <ul class="luxe-nav-menu">
+                <li><a class="luxe-nav-link" asp-controller="Home" asp-action="Index">Trang Chủ</a></li>
+                <li><a class="luxe-nav-link" asp-controller="Products" asp-action="Index">Sản Phẩm</a></li>
+                <li><a class="luxe-nav-link" href="/Products?category=phong-khach">Phòng Khách</a></li>
+                <li><a class="luxe-nav-link" href="/Products?category=phong-ngu">Phòng Ngủ</a></li>
+                <li><a class="luxe-nav-link" href="/Products?category=phong-an">Phòng Ăn</a></li>
+                <li><a class="luxe-nav-link" href="/Products?category=van-phong">Văn Phòng</a></li>
+                <li><a class="luxe-nav-link" href="/Products?category=nha-bep">Nhà Bếp</a></li>
+            </ul>
+
+            <div class="luxe-nav-actions">
+                <a href="/Cart" class="btn-luxe-ghost" title="Giỏ Hàng" style="position: relative; display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.85rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    Giỏ hàng
+                    <span id="cart-badge" class="badge rounded-circle d-flex align-items-center justify-content-center" style="background-color: var(--color-primary-container); color: white; width: 20px; height: 20px; font-size: 0.7rem; font-weight: 700; padding: 0; @(cartCount > 0 ? "" : "display: none !important;")">@cartCount</span>
+                </a>
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <span class="text-muted" style="font-size: 0.85rem; font-weight: 600; text-transform: none; letter-spacing: normal; margin-right: 8px;">Xin chào, @User.Identity.Name</span>
+                    @if (User.IsInRole("admin"))
+                    {
+                        <a asp-controller="Products" asp-action="Admin" class="btn-luxe btn-luxe-outline" style="padding: 6px 16px; font-size: 0.75rem; margin-right: 8px;">Admin</a>
+                    }
+                    <a asp-controller="Account" asp-action="Logout" class="btn-luxe btn-luxe-outline" style="padding: 6px 16px; font-size: 0.75rem;">Đăng xuất</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="btn-luxe btn-luxe-primary">Đăng nhập</a>
+                }
+            </div>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="luxe-footer">
+        <div class="footer-grid">
+            <div class="footer-col footer-col-brand">
+                <div class="footer-brand">Nội Thất LUXE</div>
+                <p class="footer-description">
+                    Mang đến không gian sống sang trọng và tiện nghi với những sản phẩm nội thất chất lượng cao, được thiết kế tinh tế bởi các chuyên gia hàng đầu.
+                </p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Danh Mục</h4>
+                <ul class="footer-links">
+                    <li><a href="/Products?category=phong-khach">Phòng Khách</a></li>
+                    <li><a href="/Products?category=phong-ngu">Phòng Ngủ</a></li>
+                    <li><a href="/Products?category=phong-an">Phòng Ăn</a></li>
+                    <li><a href="/Products?category=van-phong">Văn Phòng</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Hỗ Trợ</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Chính sách đổi trả</a></li>
+                    <li><a href="#">Hướng dẫn mua hàng</a></li>
+                    <li><a href="#">Liên hệ</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Liên Hệ</h4>
+                <div class="footer-contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span>123 Đường Nội Thất, Q.1, TP.HCM</span>
+                </div>
+                <div class="footer-contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <span>0909 123 456</span>
+                </div>
+                <div class="footer-contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    <span>info@noithatluxe.vn</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>&copy; 2026 Nội Thất LUXE. Mang đến không gian sống sang trọng.</div>
+            <div class="footer-socials">
+                <a href="#" title="Facebook">Facebook</a>
+                <a href="#" title="Instagram">Instagram</a>
+                <a href="#" title="Pinterest">Pinterest</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    
+    <script>
+        // Highlighting active page link in navigation
+        $(function() {
+            var currentUrl = window.location.pathname + window.location.search;
+            var currentPath = window.location.pathname;
+            
+            var matched = false;
+            
+            // 1. Try to match full URL (path + query string) exactly for specific categories
+            $('.luxe-nav-link').each(function() {
+                var href = $(this).attr('href');
+                if (href && href !== '/' && currentUrl === href) {
+                    $(this).addClass('active');
+                    matched = true;
+                }
+            });
+            
+            // 2. Fallback to path prefix matching if no category link matched
+            if (!matched) {
+                $('.luxe-nav-link').each(function() {
+                    var href = $(this).attr('href');
+                    if (href && href !== '/' && !href.includes('?')) {
+                        if (currentPath === href || currentPath.startsWith(href + '/')) {
+                            $(this).addClass('active');
+                            matched = true;
+                        }
+                    }
+                });
+            }
+            
+            // 3. Fallback to Trang chủ if nothing else is matched
+            if (!matched) {
+                $('.luxe-nav-link').each(function() {
+                    var href = $(this).attr('href');
+                    if (href === '/' || href.includes('Index') && href.includes('Home')) {
+                        $(this).addClass('active');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

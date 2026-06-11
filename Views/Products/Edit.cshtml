@@ -1,0 +1,109 @@
+@model furniture_store.Models.Product
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Sản Phẩm";
+}
+
+<div class="container mt-5 mb-5" style="max-width: 720px;">
+    <div class="page-header" style="border: none; margin-bottom: 24px; padding-bottom: 0;">
+        <a asp-action="Index" class="text-muted" style="font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>
+            Quay lại danh sách sản phẩm
+        </a>
+    </div>
+
+    <div class="luxe-card">
+        <h2 class="font-serif mb-4" style="font-size: 1.8rem;">Chỉnh Sửa Sản Phẩm</h2>
+        
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger-luxe mb-3"></div>
+            
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreatedAt" />
+            
+            <div class="row">
+                <div class="col-md-6 form-group-luxe">
+                    <label asp-for="Name" class="form-label-luxe">Tên sản phẩm</label>
+                    <input asp-for="Name" class="form-control-luxe" placeholder="Nhập tên sản phẩm..." id="ProductName" />
+                    <span asp-validation-for="Name" class="text-danger-luxe"></span>
+                </div>
+                
+                <div class="col-md-6 form-group-luxe">
+                    <label asp-for="Slug" class="form-label-luxe">Slug liên kết</label>
+                    <input asp-for="Slug" class="form-control-luxe" placeholder="sofa-da-cao-cap..." id="ProductSlug" />
+                    <span asp-validation-for="Slug" class="text-danger-luxe"></span>
+                </div>
+            </div>
+
+            <div class="form-group-luxe">
+                <label asp-for="Description" class="form-label-luxe">Mô tả sản phẩm</label>
+                <textarea asp-for="Description" class="form-control-luxe" rows="4" placeholder="Nhập mô tả sản phẩm..." style="resize: vertical;"></textarea>
+                <span asp-validation-for="Description" class="text-danger-luxe"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 form-group-luxe">
+                    <label asp-for="Price" class="form-label-luxe">Giá sản phẩm (₫)</label>
+                    <input asp-for="Price" type="number" class="form-control-luxe" />
+                    <span asp-validation-for="Price" class="text-danger-luxe"></span>
+                </div>
+                
+                <div class="col-md-6 form-group-luxe">
+                    <label asp-for="Stock" class="form-label-luxe">Số lượng kho</label>
+                    <input asp-for="Stock" type="number" class="form-control-luxe" />
+                    <span asp-validation-for="Stock" class="text-danger-luxe"></span>
+                </div>
+            </div>
+
+            <div class="form-group-luxe">
+                <label asp-for="ImageUrl" class="form-label-luxe">Đường dẫn hình ảnh (URL)</label>
+                <input asp-for="ImageUrl" class="form-control-luxe" />
+                <span asp-validation-for="ImageUrl" class="text-danger-luxe"></span>
+            </div>
+
+            <div class="row align-items-center">
+                <div class="col-md-6 form-group-luxe">
+                    <label asp-for="CategoryId" class="form-label-luxe">Danh mục / Không gian</label>
+                    <select asp-for="CategoryId" class="form-control-luxe" asp-items="ViewBag.CategoryId" style="background-color: white;"></select>
+                    <span asp-validation-for="CategoryId" class="text-danger-luxe"></span>
+                </div>
+                
+                <div class="col-md-6 form-group-luxe" style="margin-top: 15px;">
+                    <label class="checkbox-luxe">
+                        <input asp-for="Featured" type="checkbox" />
+                        <span class="form-label-luxe" style="margin-bottom: 0; display: inline-block;">Sản phẩm nổi bật</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 d-flex gap-3">
+                <button type="submit" class="btn-luxe btn-luxe-primary px-4">Lưu thay đổi</button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn-luxe btn-luxe-outline px-4">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Automatic slug generation helper
+        $(function() {
+            $('#ProductName').on('input', function() {
+                var name = $(this).val();
+                var slug = name.toLowerCase()
+                    .replace(/á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/g, 'a')
+                    .replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/g, 'e')
+                    .replace(/í|ì|ỉ|ĩ|ị/g, 'i')
+                    .replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/g, 'o')
+                    .replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/g, 'u')
+                    .replace(/ý|ỳ|ỷ|ỹ|ỵ/g, 'y')
+                    .replace(/đ/g, 'd')
+                    .replace(/[^a-z0-9 -]/g, '') 
+                    .replace(/\s+/g, '-')           
+                    .replace(/-+/g, '-');          
+                $('#ProductSlug').val(slug);
+            });
+        });
+    </script>
+}

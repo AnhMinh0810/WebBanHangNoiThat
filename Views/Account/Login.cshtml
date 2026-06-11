@@ -1,0 +1,47 @@
+@model furniture_store.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Đăng Nhập";
+}
+
+<div class="container d-flex justify-content-center align-items-center mt-5 mb-5" style="min-height: calc(100vh - 73px - 360px);">
+    <div class="luxe-card text-center" style="width: 100%; max-width: 460px; padding: 48px 36px; border-radius: var(--radius-xl);">
+        
+        <!-- Brand Logo -->
+        <a class="luxe-brand mb-4 d-inline-flex align-items-center justify-content-center" asp-controller="Home" asp-action="Index">
+            <span class="luxe-brand-sub" style="font-size: 0.75rem; letter-spacing: 0.35em;">Nội Thất</span>
+            <span class="luxe-brand-main" style="font-size: 1.6rem; letter-spacing: 0.1em; color: var(--color-primary);">LUXE</span>
+        </a>
+
+        <h2 class="font-serif mb-2" style="font-size: 1.8rem; font-weight: 700;">Đăng Nhập</h2>
+        <p class="text-muted mb-4" style="font-size: 0.9rem;">Chào mừng bạn quay lại!</p>
+
+        <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="text-left">
+            <div asp-validation-summary="ModelOnly" class="text-danger-luxe mb-3"></div>
+
+            <div class="form-group-luxe">
+                <label asp-for="Email" class="form-label-luxe">Email</label>
+                <input asp-for="Email" class="form-control-luxe" placeholder="email@example.com" />
+                <span asp-validation-for="Email" class="text-danger-luxe"></span>
+            </div>
+
+            <div class="form-group-luxe">
+                <label asp-for="Password" class="form-label-luxe">Mật khẩu</label>
+                <input asp-for="Password" type="password" class="form-control-luxe" placeholder="••••••••" />
+                <span asp-validation-for="Password" class="text-danger-luxe"></span>
+            </div>
+
+            <button type="submit" class="btn-luxe btn-luxe-primary w-100 py-3 mt-2" style="font-size: 0.9rem;">Đăng Nhập</button>
+        </form>
+
+        <div class="mt-4" style="font-size: 0.85rem; color: var(--color-outline);">
+            Chưa có tài khoản? <a asp-controller="Account" asp-action="Register" class="text-gold font-weight-bold" style="text-decoration: underline;">Đăng ký ngay</a>
+        </div>
+
+       
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

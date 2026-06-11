@@ -1,0 +1,87 @@
+@model IEnumerable<furniture_store.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Giỏ Hàng";
+    decimal totalSum = Model.Sum(i => i.Total);
+}
+
+<div class="container mt-5 mb-5">
+    <div class="page-header" style="border: none; margin-bottom: 32px;">
+        <h1 class="page-title d-flex align-items-center" style="font-size: 2.2rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary); margin-right: 12px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Giỏ Hàng
+        </h1>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 luxe-card">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-muted mb-4"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <h2 class="font-serif">Giỏ hàng của bạn đang trống</h2>
+            <p class="text-muted mb-4">Hãy lấp đầy nó bằng các thiết kế nội thất sang trọng của Luxe.</p>
+            <a href="/Products" class="btn-luxe btn-luxe-primary px-5 py-3">Khám Phá Cửa Hàng</a>
+        </div>
+    }
+    else
+    {
+        <!-- Cart Items Table -->
+        <div class="luxe-card p-0 overflow-hidden mb-4" style="border-radius: var(--radius-lg);">
+            <table class="table mb-0 align-middle" style="border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: var(--color-surface-low); border-bottom: 1px solid var(--color-surface-container);">
+                        <th class="py-3 px-4" style="font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-outline); width: 120px;">Sản Phẩm</th>
+                        <th class="py-3 px-4" style="font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-outline);">Tên</th>
+                        <th class="py-3 px-4" style="font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-outline);">Đơn Giá</th>
+                        <th class="py-3 px-4" style="font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-outline); width: 200px;">Số Lượng</th>
+                        <th class="py-3 px-4" style="font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-outline);">Thành Tiền</th>
+                        <th class="py-3 px-4 text-center" style="font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-outline); width: 80px;">Xóa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr style="border-bottom: 1px solid var(--color-surface-container);">
+                            <td class="py-4 px-4">
+                                <img src="@item.ImageUrl" alt="@item.Name" style="width: 70px; height: 70px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--color-outline-variant);" onerror="this.onerror=null; this.src='/images/hero_sofa.png';" />
+                            </td>
+                            <td class="py-4 px-4" style="font-weight: 600; color: var(--color-on-surface); font-size: 1rem;">@item.Name</td>
+                            <td class="py-4 px-4" style="color: var(--color-on-surface-variant);">@item.Price.ToString("N0") ₫</td>
+                            <td class="py-4 px-4">
+                                <form asp-controller="Cart" asp-action="Update" method="post" class="d-flex align-items-center gap-2">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control-luxe" style="width: 60px; text-align: center; height: 38px; padding: 6px;" />
+                                    <button type="submit" class="btn-luxe btn-luxe-outline" style="padding: 6px 12px; height: 38px; text-transform: none; font-size: 0.8rem;">Cập nhật</button>
+                                </form>
+                            </td>
+                            <td class="py-4 px-4 text-gold font-weight-bold" style="font-size: 1.05rem;">@item.Total.ToString("N0") ₫</td>
+                            <td class="py-4 px-4 text-center">
+                                <form asp-controller="Cart" asp-action="Remove" method="post" class="d-inline">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button type="submit" class="btn" style="background-color: var(--color-error); border: 1px solid var(--color-error); color: white; width: 36px; height: 36px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center; padding: 0;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Sum -->
+        <div class="text-right mb-5" style="text-align: right;">
+            <h3 class="font-serif" style="font-size: 1.6rem; color: var(--color-on-surface); font-weight: 600;">
+                Tổng cộng: <span class="text-gold">@totalSum.ToString("N0") ₫</span>
+            </h3>
+        </div>
+
+        <!-- Cart Actions -->
+        <div class="d-flex justify-content-end gap-3 align-items-center flex-wrap">
+            <form asp-controller="Cart" asp-action="Clear" method="post" class="d-inline">
+                <button type="submit" class="btn-luxe btn-luxe-outline" style="padding: 12px 28px;">Xóa Giỏ Hàng</button>
+            </form>
+            <a href="/Products" class="btn-luxe btn-luxe-outline" style="padding: 12px 28px;">← Tiếp Tục Mua</a>
+            <a href="/Cart/Checkout" class="btn-luxe btn-luxe-primary" style="padding: 12px 36px; font-size: 0.85rem; background-color: var(--color-primary-container);">Thanh Toán →</a>
+        </div>
+    }
+</div>
