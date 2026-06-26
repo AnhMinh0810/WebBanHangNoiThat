@@ -204,7 +204,7 @@ public class CartController : Controller
             Address = address,
             Note = note,
             PaymentMethod = paymentMethod,
-            Status = "pending",
+            Status = (paymentMethod == "bank" || paymentMethod == "momo") ? "paid" : "pending",
             CreatedAt = DateTime.Now,
             Total = items.Sum(i => i.Total)
         };

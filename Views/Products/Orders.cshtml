@@ -1,0 +1,232 @@
+@model IEnumerable<furniture_store.Models.Order>
+
+@{
+    ViewData["Title"] = "Quản Lý Đơn Hàng";
+}
+
+<style>
+    .order-row:hover {
+        background-color: var(--color-surface-low);
+    }
+    .badge-luxe {
+        padding: 6px 12px;
+        font-family: var(--font-sans);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        border-radius: var(--radius-sm);
+        display: inline-block;
+        white-space: nowrap;
+    }
+    .badge-pending {
+        background-color: #fff8e1;
+        color: #b78103;
+        border: 1px solid #ffe082;
+    }
+    .badge-shipped {
+        background-color: #e3f2fd;
+        color: #0d47a1;
+        border: 1px solid #90caf9;
+    }
+    .badge-paid {
+        background-color: #e8f5e9;
+        color: #1b5e20;
+        border: 1px solid #a5d6a7;
+    }
+    .details-table th {
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-outline);
+        border-bottom: 1px solid var(--color-surface-container);
+        background-color: var(--color-surface-low);
+    }
+    .details-table td {
+        font-size: 0.85rem;
+        color: var(--color-on-surface-variant);
+    }
+    .btn-toggle-details {
+        white-space: nowrap;
+    }
+    .status-select {
+        height: 36px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        width: 100%;
+        background-color: white;
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+    
+    <!-- Admin Header -->
+    <div class="page-header align-items-center">
+        <div>
+            <h1 class="page-title d-flex align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary); margin-right: 12px;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                Quản Lý Đơn Hàng
+            </h1>
+            <p class="page-subtitle">Tổng: @Model.Count() đơn hàng</p>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="luxe-card p-0 overflow-hidden" style="border-radius: var(--radius-lg);">
+        <table class="table mb-0 align-middle" style="border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #1c1c18; color: #ffffff;">
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; width: 90px;">Mã Đơn</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">Khách Hàng</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; max-width: 250px;">Địa Chỉ / Ghi Chú</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; width: 140px;">Tổng Tiền</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; width: 140px;">Ngày Đặt</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; width: 90px;">PTTT</th>
+                    <th class="py-3 px-4" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; width: 150px;">Trạng Thái</th>
+                    <th class="py-3 px-4 text-center" style="color: #ffffff; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; width: 260px;">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr class="order-row" style="border-bottom: 1px solid var(--color-surface-container);">
+                        <td class="py-3 px-4 font-weight-bold">#@order.Id</td>
+                        <td class="py-3 px-4">
+                            <span class="font-weight-bold text-charcoal">@order.CustomerName</span><br/>
+                            <small class="text-muted">@order.CustomerPhone</small><br/>
+                            <small class="text-muted" style="font-size: 0.75rem;">@order.CustomerEmail</small>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="d-inline-block text-truncate" style="max-width: 220px;" title="@order.Address">@order.Address</span>
+                            @if (!string.IsNullOrEmpty(order.Note))
+                            {
+                                <br/><small class="text-danger" style="font-style: italic;">Note: @order.Note</small>
+                            }
+                        </td>
+                        <td class="py-3 px-4 text-gold font-weight-bold">@order.Total.ToString("N0") ₫</td>
+                        <td class="py-3 px-4" style="font-size: 0.85rem;">@(order.CreatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
+                        <td class="py-3 px-4 text-uppercase text-muted" style="font-size: 0.8rem; font-weight: 700;">@order.PaymentMethod</td>
+                        <td class="py-3 px-4">
+                            <span id="status-badge-@order.Id" class="badge-luxe badge-@order.Status">
+                                @(order.Status switch {
+                                    "shipped" => "Đang vận chuyển",
+                                    "paid" => "Đã thanh toán",
+                                    _ => "Mới (Chờ xử lý)"
+                                })
+                            </span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="d-flex align-items-center gap-2">
+                                <select class="status-select form-control-luxe" style="width: auto; min-width: 140px; height: 36px; padding: 4px 8px; font-size: 0.8rem; background-color: white;" data-id="@order.Id">
+                                    <option value="pending" selected="@(order.Status == "pending" ? "selected" : null)">Mới</option>
+                                    <option value="shipped" selected="@(order.Status == "shipped" ? "selected" : null)">Đang giao</option>
+                                    <option value="paid" selected="@(order.Status == "paid" ? "selected" : null)">Đã thanh toán</option>
+                                </select>
+                                <button class="btn-luxe btn-luxe-outline py-2 px-3 btn-toggle-details" style="font-size: 0.75rem; padding: 6px 12px;" type="button" data-bs-toggle="collapse" data-bs-target="#details-@order.Id" aria-expanded="false" aria-controls="details-@order.Id">
+                                    Chi tiết
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Collapsible Details Row -->
+                    <tr class="collapse" id="details-@order.Id" style="background-color: var(--color-surface-low);">
+                        <td colspan="8" class="p-4" style="border-bottom: 1px solid var(--color-surface-container);">
+                            <div class="p-3 bg-white" style="border: 1px solid var(--color-outline-variant); border-radius: var(--radius-md);">
+                                <h5 class="font-serif mb-3" style="font-size: 1.1rem; color: var(--color-on-surface); font-weight: 700;">
+                                    Danh sách sản phẩm mua
+                                </h5>
+                                <table class="table table-sm details-table mb-0 align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th class="py-2" style="width: 80px;">Ảnh</th>
+                                            <th class="py-2">Tên sản phẩm</th>
+                                            <th class="py-2 text-center" style="width: 100px;">Số lượng</th>
+                                            <th class="py-2 text-end" style="width: 150px;">Đơn giá</th>
+                                            <th class="py-2 text-end" style="width: 180px;">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in order.OrderItems)
+                                        {
+                                            var subtotal = item.Price * item.Quantity;
+                                            <tr>
+                                                <td class="py-2">
+                                                    <img src="@(item.Product?.ImageUrl ?? "/images/hero_sofa.png")" alt="@item.ProductName" style="width: 40px; height: 40px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--color-outline-variant);" onerror="this.onerror=null; this.src='/images/hero_sofa.png';" />
+                                                </td>
+                                                <td class="py-2 font-weight-bold" style="color: var(--color-on-surface);">@(item.ProductName ?? (item.Product != null ? item.Product.Name : "Sản phẩm"))</td>
+                                                <td class="py-2 text-center font-weight-bold text-success">@item.Quantity</td>
+                                                <td class="py-2 text-end text-gold">@item.Price.ToString("N0") ₫</td>
+                                                <td class="py-2 text-end text-gold font-weight-bold">@subtotal.ToString("N0") ₫</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            // Handle Dropdown Status change via AJAX
+            $('.status-select').on('change', function() {
+                const orderId = $(this).val() ? $(this).data('id') : null;
+                const newStatus = $(this).val();
+                
+                if (!orderId) return;
+
+                const badge = $(`#status-badge-${orderId}`);
+                const select = $(this);
+                
+                // Disable to prevent multiple requests
+                select.prop('disabled', true);
+
+                $.ajax({
+                    url: '/Products/UpdateOrderStatus',
+                    type: 'POST',
+                    data: {
+                        id: orderId,
+                        status: newStatus
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            // Update display badge
+                            badge.text(getStatusLabel(res.newStatus));
+                            badge.removeClass('badge-pending badge-shipped badge-paid');
+                            badge.addClass(`badge-${res.newStatus}`);
+                        } else {
+                            alert('Cập nhật thất bại: ' + res.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Đã xảy ra lỗi kết nối khi cập nhật trạng thái đơn hàng.');
+                    },
+                    complete: function() {
+                        select.prop('disabled', false);
+                    }
+                });
+            });
+
+            function getStatusLabel(status) {
+                switch(status) {
+                    case 'shipped':
+                        return 'Đang vận chuyển';
+                    case 'paid':
+                        return 'Đã thanh toán';
+                    default:
+                        return 'Mới (Chờ xử lý)';
+                }
+            }
+        });
+    </script>
+}

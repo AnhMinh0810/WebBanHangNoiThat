@@ -1,0 +1,367 @@
+@{
+    ViewData["Title"] = "Báo Cáo Doanh Thu";
+}
+
+<style>
+    .revenue-card {
+        background: #ffffff;
+        border: 1px solid var(--color-surface-container);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        box-shadow: 0 4px 16px rgba(28, 28, 24, 0.01);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .revenue-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background-color: var(--color-primary-container);
+    }
+    .revenue-card-day::before {
+        background-color: var(--color-primary-container);
+    }
+    .revenue-card-month::before {
+        background-color: #2e7d32; /* Success green */
+    }
+    .revenue-card-year::before {
+        background-color: #1a73e8; /* Blue */
+    }
+    .revenue-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(28, 28, 24, 0.04);
+        border-color: var(--color-outline-variant);
+    }
+    .revenue-value {
+        font-family: var(--font-sans);
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--color-on-surface);
+        margin-top: 8px;
+        margin-bottom: 0;
+        transition: opacity 0.2s ease;
+    }
+    .revenue-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--color-outline);
+    }
+    #chartContainer {
+        transition: opacity 0.2s ease;
+    }
+    .loader-overlay {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(252, 249, 242, 0.7);
+        backdrop-filter: blur(2px);
+        z-index: 10;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-lg);
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+    
+    <!-- Header -->
+    <div class="page-header align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="page-title d-flex align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary); margin-right: 12px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Báo Cáo Doanh Thu
+            </h1>
+            <p class="page-subtitle">Xem phân tích doanh thu theo ngày, tháng, năm</p>
+        </div>
+    </div>
+
+    <!-- Date Picker Row -->
+    <div class="luxe-card mb-4 py-4 px-4">
+        <div class="row align-items-center">
+            <div class="col-md-8 col-12 mb-3 mb-md-0">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <label for="datePicker" class="form-label-luxe m-0" style="white-space: nowrap;">Chọn ngày cụ thể:</label>
+                    <input type="date" id="datePicker" class="form-control-luxe" style="max-width: 200px; height: 42px;" />
+                    <button type="button" id="btnViewRevenue" class="btn-luxe btn-luxe-outline d-flex align-items-center gap-2" style="height: 42px; border-color: #1a73e8; color: #1a73e8; padding: 0 16px; font-size: 0.85rem; font-weight: 700; text-transform: none; border-radius: var(--radius-md); letter-spacing: normal; background-color: transparent;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #1a73e8;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                        View Revenue
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4 col-12 text-md-end text-start">
+                <span class="text-muted" style="font-size: 0.85rem;">
+                    Ngày đang chọn: <strong id="selectedDateText" class="text-charcoal">—</strong>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards Row -->
+    <div class="row g-4 mb-5">
+        <!-- Daily Revenue -->
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="revenue-card revenue-card-day">
+                <div class="revenue-label">Doanh thu ngày</div>
+                <div id="dailyRevenue" class="revenue-value text-gold">0 ₫</div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="revenue-card revenue-card-month">
+                <div class="revenue-label">Doanh thu tháng</div>
+                <div id="monthlyRevenue" class="revenue-value" style="color: #2e7d32;">0 ₫</div>
+            </div>
+        </div>
+
+        <!-- Yearly Revenue -->
+        <div class="col-lg-4 col-md-12 col-12">
+            <div class="revenue-card revenue-card-year">
+                <div class="revenue-label">Doanh thu năm</div>
+                <div id="yearlyRevenue" class="revenue-value" style="color: #1a73e8;">0 ₫</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Row -->
+    <div class="luxe-card p-4" style="position: relative; min-height: 480px;">
+        <div class="loader-overlay" id="chartLoader">
+            <div class="spinner-border" style="color: var(--color-primary);" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        
+        <h3 class="font-serif mb-4" style="font-size: 1.4rem;">
+            Biểu đồ doanh thu
+        </h3>
+        
+        <div id="chartContainer" style="height: 380px;">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <!-- Import Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        $(function() {
+            let myChart = null;
+
+            // Formatter for Currency
+            const formatter = new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            });
+
+            function formatCurrency(amount) {
+                // Ensure correct formatting with symbol
+                return formatter.format(amount);
+            }
+
+            // Generate Local Date String (YYYY-MM-DD)
+            function getLocalDateString() {
+                const now = new Date();
+                const offset = now.getTimezoneOffset();
+                const localDate = new Date(now.getTime() - (offset * 60 * 1000));
+                return localDate.toISOString().split('T')[0];
+            }
+
+            // Keep track of the last loaded valid date
+            let lastValidDate = getLocalDateString();
+
+            // Load revenue data via AJAX
+            function loadRevenueData(dateString) {
+                // Display loading indicators
+                $('.revenue-value').css('opacity', '0.4');
+                $('#chartLoader').css('display', 'flex');
+                $('#chartContainer').css('opacity', '0.4');
+
+                $.ajax({
+                    url: '/Products/GetRevenueData',
+                    type: 'GET',
+                    data: { date: dateString },
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.success) {
+                            // Update KPI Card values
+                            $('#dailyRevenue').text(formatCurrency(res.dailyRevenue));
+                            $('#monthlyRevenue').text(formatCurrency(res.monthlyRevenue));
+                            $('#yearlyRevenue').text(formatCurrency(res.yearlyRevenue));
+
+                            // Update Chart.js
+                            renderChart(res.chartData);
+
+                            // Sync the UI and input with the actual date returned by server
+                            lastValidDate = res.selectedDate;
+                            $('#datePicker').val(res.selectedDate);
+                            const parts = res.selectedDate.split('-');
+                            if (parts.length === 3) {
+                                $('#selectedDateText').text(`${parts[2]}/${parts[1]}/${parts[0]}`);
+                            }
+                        } else {
+                            alert('Không thể tải dữ liệu doanh thu.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error: ', error);
+                        alert('Đã xảy ra lỗi kết nối khi lấy dữ liệu doanh thu.');
+                    },
+                    complete: function() {
+                        // Hide loading indicators
+                        $('.revenue-value').css('opacity', '1');
+                        $('#chartLoader').css('display', 'none');
+                        $('#chartContainer').css('opacity', '1');
+                    }
+                });
+            }
+
+            // Render or Update the Column Chart using Chart.js
+            function renderChart(chartData) {
+                const labels = chartData.map(item => item.dateLabel);
+                const totals = chartData.map(item => item.total);
+
+                if (myChart) {
+                    // Update data instead of destroying to allow smooth transition animation
+                    myChart.data.labels = labels;
+                    myChart.data.datasets[0].data = totals;
+                    myChart.update();
+                } else {
+                    const ctx = document.getElementById('revenueChart').getContext('2d');
+                    myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Doanh thu',
+                                data: totals,
+                                backgroundColor: '#8c6d1f', // Luxe gold secondary color
+                                borderColor: '#715503',     // Luxe gold primary color
+                                borderWidth: 1,
+                                borderRadius: 6,
+                                hoverBackgroundColor: '#715503',
+                                barThickness: 'flex',
+                                maxBarThickness: 50
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    backgroundColor: '#1c1c18',
+                                    titleFont: {
+                                        family: "'Plus Jakarta Sans', sans-serif",
+                                        size: 13,
+                                        weight: 'bold'
+                                    },
+                                    bodyFont: {
+                                        family: "'Plus Jakarta Sans', sans-serif",
+                                        size: 13
+                                    },
+                                    padding: 12,
+                                    borderColor: 'var(--color-outline-variant)',
+                                    borderWidth: 1,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return ' Doanh thu: ' + formatCurrency(context.raw);
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: '#e5e2db'
+                                    },
+                                    ticks: {
+                                        font: {
+                                            family: "'Plus Jakarta Sans', sans-serif",
+                                            size: 11
+                                        },
+                                        color: '#7f7666',
+                                        callback: function(value) {
+                                            if (value >= 1000000) {
+                                                return (value / 1000000).toFixed(1) + ' Tr ₫';
+                                            } else if (value >= 1000) {
+                                                return (value / 1000).toFixed(0) + ' K ₫';
+                                            }
+                                            return value + ' ₫';
+                                        }
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        font: {
+                                            family: "'Plus Jakarta Sans', sans-serif",
+                                            size: 11,
+                                            weight: 'bold'
+                                        },
+                                        color: '#1c1c18'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Initialize Date Picker value to local today
+            const todayStr = getLocalDateString();
+            $('#datePicker').val(todayStr);
+
+            // Initial load of revenue data
+            loadRevenueData(todayStr);
+
+            // Trigger load on button click
+            $('#btnViewRevenue').on('click', function() {
+                submitDate();
+            });
+
+            // Trigger load on Enter key inside input
+            $('#datePicker').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    submitDate();
+                }
+            });
+
+            function submitDate() {
+                const selectedDate = $('#datePicker').val();
+                if (selectedDate) {
+                    const parts = selectedDate.split('-');
+                    if (parts.length === 3) {
+                        const year = parseInt(parts[0], 10);
+                        if (year < 1754) {
+                            alert('Năm không hợp lệ. Vui lòng nhập năm từ 1754 trở đi.');
+                            $('#datePicker').val(lastValidDate);
+                            loadRevenueData(lastValidDate);
+                            return;
+                        }
+                    }
+                    loadRevenueData(selectedDate);
+                } else {
+                    $('#datePicker').val(lastValidDate);
+                    loadRevenueData(lastValidDate);
+                }
+            }
+        });
+    </script>
+}

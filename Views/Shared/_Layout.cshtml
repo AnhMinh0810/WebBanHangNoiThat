@@ -50,12 +50,14 @@
                 </a>
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    <span class="text-muted" style="font-size: 0.85rem; font-weight: 600; text-transform: none; letter-spacing: normal; margin-right: 8px;">Xin chào, @User.Identity.Name</span>
+                    <span class="text-muted" style="font-size: 0.85rem; font-weight: 600; text-transform: none; letter-spacing: normal; margin-right: 4px; white-space: nowrap;">Xin chào, @User.Identity.Name</span>
                     @if (User.IsInRole("admin"))
                     {
-                        <a asp-controller="Products" asp-action="Admin" class="btn-luxe btn-luxe-outline" style="padding: 6px 16px; font-size: 0.75rem; margin-right: 8px;">Admin</a>
+                        <a asp-controller="Products" asp-action="Admin" class="btn-luxe btn-luxe-outline" style="padding: 6px 12px; font-size: 0.75rem; margin-right: 4px; white-space: nowrap;">Quản lý SP</a>
+                        <a asp-controller="Products" asp-action="Orders" class="btn-luxe btn-luxe-outline" style="padding: 6px 12px; font-size: 0.75rem; margin-right: 4px; white-space: nowrap;">Đơn hàng</a>
+                        <a asp-controller="Products" asp-action="Revenue" class="btn-luxe btn-luxe-outline" style="padding: 6px 12px; font-size: 0.75rem; margin-right: 4px; white-space: nowrap;">Doanh thu</a>
                     }
-                    <a asp-controller="Account" asp-action="Logout" class="btn-luxe btn-luxe-outline" style="padding: 6px 16px; font-size: 0.75rem;">Đăng xuất</a>
+                    <a asp-controller="Account" asp-action="Logout" class="btn-luxe btn-luxe-outline" style="padding: 6px 12px; font-size: 0.75rem; white-space: nowrap;">Đăng xuất</a>
                 }
                 else
                 {

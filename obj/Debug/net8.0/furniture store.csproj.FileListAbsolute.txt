@@ -252,3 +252,4 @@ D:\Web Dev\furniture store\furniture store\obj\Debug\net8.0\furniture store.pdb
 D:\Web Dev\furniture store\furniture store\obj\Debug\net8.0\furniture store.genruntimeconfig.cache
 D:\Web Dev\furniture store\furniture store\obj\Debug\net8.0\ref\furniture store.dll
 D:\Web Dev\furniture store\furniture store\bin\Debug\net8.0\BCrypt-Net-Next.dll
+D:\Web Dev\furniture store\furniture store\obj\Debug\net8.0\furniture store.sourcelink.json
