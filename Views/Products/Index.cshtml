@@ -5,6 +5,7 @@
     var categories = ViewData["Categories"] as List<furniture_store.Models.Category> ?? new List<furniture_store.Models.Category>();
     var currentCategory = ViewData["CurrentCategory"] as string;
     var activeCategoryName = categories.FirstOrDefault(c => c.Slug == currentCategory)?.Name ?? "Tất Cả Sản Phẩm";
+    var currentSearch = ViewData["CurrentSearch"] as string;
 }
 
 <div class="container mt-5 mb-5">
@@ -20,12 +21,12 @@
             <h3 class="sidebar-title">Không Gian</h3>
             <ul class="sidebar-menu">
                 <li>
-                    <a href="/Products@(string.IsNullOrEmpty(ViewData["CurrentSort"] as string) ? "" : "?sortOrder=" + ViewData["CurrentSort"])" class="@(string.IsNullOrEmpty(currentCategory) ? "active" : "")">Tất Cả Sản Phẩm</a>
+                    <a href="/Products@(string.IsNullOrEmpty(currentSearch) ? "" : "?search=" + Uri.EscapeDataString(currentSearch))@(string.IsNullOrEmpty(ViewData["CurrentSort"] as string) ? "" : (string.IsNullOrEmpty(currentSearch) ? "?" : "&") + "sortOrder=" + ViewData["CurrentSort"])" class="@(string.IsNullOrEmpty(currentCategory) ? "active" : "")">Tất Cả Sản Phẩm</a>
                 </li>
                 @foreach (var cat in categories)
                 {
                     <li>
-                        <a href="/Products?category=@cat.Slug@(string.IsNullOrEmpty(ViewData["CurrentSort"] as string) ? "" : "&sortOrder=" + ViewData["CurrentSort"])" class="@(currentCategory == cat.Slug ? "active" : "")">@cat.Name</a>
+                        <a href="/Products?category=@cat.Slug@(string.IsNullOrEmpty(currentSearch) ? "" : "&search=" + Uri.EscapeDataString(currentSearch))@(string.IsNullOrEmpty(ViewData["CurrentSort"] as string) ? "" : "&sortOrder=" + ViewData["CurrentSort"])" class="@(currentCategory == cat.Slug ? "active" : "")">@cat.Name</a>
                     </li>
                 }
             </ul>
@@ -36,13 +37,41 @@
                 <div class="product-count text-muted" style="font-size: 0.9rem;">
                     Hiển thị <strong>@Model.Count()</strong> trên <strong>@ViewData["TotalItems"]</strong> sản phẩm
                 </div>
-                <div class="product-sorting d-flex align-items-center gap-2">
-                    <span class="text-muted" style="font-size: 0.85rem; white-space: nowrap;">Sắp xếp theo:</span>
-                    <select id="sortSelect" class="form-control-luxe py-1 px-3" style="font-size: 0.85rem; background-color: white; width: auto; min-width: 180px; height: 38px;" onchange="location = this.value;">
-                        <option value="@Url.Action("Index", new { category = currentCategory, sortOrder = "", page = 1 })" selected="@(string.IsNullOrEmpty(ViewData["CurrentSort"] as string) ? "selected" : null)">Mặc định</option>
-                        <option value="@Url.Action("Index", new { category = currentCategory, sortOrder = "price_asc", page = 1 })" selected="@((ViewData["CurrentSort"] as string) == "price_asc" ? "selected" : null)">Giá: Thấp đến Cao</option>
-                        <option value="@Url.Action("Index", new { category = currentCategory, sortOrder = "price_desc", page = 1 })" selected="@((ViewData["CurrentSort"] as string) == "price_desc" ? "selected" : null)">Giá: Cao đến Thấp</option>
-                    </select>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <!-- Search Form -->
+                    <form method="get" action="/Products" class="d-flex align-items-center gap-2" style="margin: 0;">
+                        @if (!string.IsNullOrEmpty(currentCategory))
+                        {
+                            <input type="hidden" name="category" value="@currentCategory" />
+                        }
+                        @if (!string.IsNullOrEmpty(ViewData["CurrentSort"] as string))
+                        {
+                            <input type="hidden" name="sortOrder" value="@ViewData["CurrentSort"]" />
+                        }
+                        <div class="d-flex align-items-center gap-1">
+                            <input type="text" name="search" value="@currentSearch" placeholder="Tìm kiếm..." class="form-control-luxe py-1 px-3" style="font-size: 0.85rem; background-color: white; width: 180px; height: 38px;" />
+                            <button type="submit" class="btn-luxe btn-luxe-primary py-1 px-3" style="height: 38px; font-size: 0.8rem; text-transform: none; letter-spacing: normal;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                Tìm
+                            </button>
+                            @if (!string.IsNullOrEmpty(currentSearch))
+                            {
+                                <a href="@Url.Action("Index", new { category = currentCategory, sortOrder = ViewData["CurrentSort"] })" class="btn-luxe btn-luxe-outline py-1 px-2 d-flex align-items-center justify-content-center" style="height: 38px; font-size: 0.8rem; text-transform: none; letter-spacing: normal;" title="Xóa tìm kiếm">
+                                    Xóa
+                                </a>
+                            }
+                        </div>
+                    </form>
+
+                    <!-- Sorting -->
+                    <div class="product-sorting d-flex align-items-center gap-2">
+                        <span class="text-muted" style="font-size: 0.85rem; white-space: nowrap;">Sắp xếp theo:</span>
+                        <select id="sortSelect" class="form-control-luxe py-1 px-3" style="font-size: 0.85rem; background-color: white; width: auto; min-width: 150px; height: 38px;" onchange="location = this.value;">
+                            <option value="@Url.Action("Index", new { category = currentCategory, search = currentSearch, sortOrder = "", page = 1 })" selected="@(string.IsNullOrEmpty(ViewData["CurrentSort"] as string) ? "selected" : null)">Mặc định</option>
+                            <option value="@Url.Action("Index", new { category = currentCategory, search = currentSearch, sortOrder = "price_asc", page = 1 })" selected="@((ViewData["CurrentSort"] as string) == "price_asc" ? "selected" : null)">Giá: Thấp đến Cao</option>
+                            <option value="@Url.Action("Index", new { category = currentCategory, search = currentSearch, sortOrder = "price_desc", page = 1 })" selected="@((ViewData["CurrentSort"] as string) == "price_desc" ? "selected" : null)">Giá: Cao đến Thấp</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -51,8 +80,16 @@
                 <div class="text-center py-5 luxe-card">
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-muted mb-3"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                     <h3 class="font-serif">Không tìm thấy sản phẩm</h3>
-                    <p class="text-muted">Không có sản phẩm nào thuộc danh mục này hiện tại.</p>
-                    <a href="/Products" class="btn-luxe btn-luxe-outline mt-3">Quay lại cửa hàng</a>
+                    @if (!string.IsNullOrEmpty(currentSearch))
+                    {
+                        <p class="text-muted">Không tìm thấy sản phẩm nào chứa từ khóa "<strong>@currentSearch</strong>" @(string.IsNullOrEmpty(currentCategory) ? "" : "trong " + activeCategoryName).</p>
+                        <a href="@Url.Action("Index", new { category = currentCategory, sortOrder = ViewData["CurrentSort"] })" class="btn-luxe btn-luxe-outline mt-3">Xóa tìm kiếm</a>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Không có sản phẩm nào thuộc danh mục này hiện tại.</p>
+                        <a href="/Products" class="btn-luxe btn-luxe-outline mt-3">Quay lại cửa hàng</a>
+                    }
                 </div>
             }
             else
@@ -84,8 +121,6 @@
                                         </button>
                                     </form>
                                 </div>
-                                
-
                             </div>
                         </div>
                     }
@@ -98,21 +133,21 @@
                     <div class="luxe-pagination d-flex justify-content-center gap-2 mt-5">
                         @if (currentPage > 1)
                         {
-                            <a href="@Url.Action("Index", new { category = currentCategory, sortOrder = ViewData["CurrentSort"], page = currentPage - 1 })" class="btn-pagination">
+                            <a href="@Url.Action("Index", new { category = currentCategory, search = currentSearch, sortOrder = ViewData["CurrentSort"], page = currentPage - 1 })" class="btn-pagination">
                                 &larr; Trước
                             </a>
                         }
 
                         @for (int i = 1; i <= totalPages; i++)
                         {
-                            <a href="@Url.Action("Index", new { category = currentCategory, sortOrder = ViewData["CurrentSort"], page = i })" class="btn-pagination @(i == currentPage ? "active" : "")">
+                            <a href="@Url.Action("Index", new { category = currentCategory, search = currentSearch, sortOrder = ViewData["CurrentSort"], page = i })" class="btn-pagination @(i == currentPage ? "active" : "")">
                                 @i
                             </a>
                         }
 
                         @if (currentPage < totalPages)
                         {
-                            <a href="@Url.Action("Index", new { category = currentCategory, sortOrder = ViewData["CurrentSort"], page = currentPage + 1 })" class="btn-pagination">
+                            <a href="@Url.Action("Index", new { category = currentCategory, search = currentSearch, sortOrder = ViewData["CurrentSort"], page = currentPage + 1 })" class="btn-pagination">
                                 Sau &rarr;
                             </a>
                         }

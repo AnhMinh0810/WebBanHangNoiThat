@@ -36,10 +36,7 @@
                         @(Model.Stock > 0 ? $"Còn hàng ({Model.Stock} sản phẩm)" : "Hết hàng")
                     </span>
                 </div>
-                <div class="details-meta-row">
-                    <span class="details-meta-label">Slug liên kết:</span>
-                    <code>@Model.Slug</code>
-                </div>
+
                 @if (Model.Featured == true)
                 {
                     <div class="details-meta-row">

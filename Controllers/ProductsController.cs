@@ -20,7 +20,7 @@ namespace furniture_store.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index(string? category, string? sortOrder, int page = 1)
+        public async Task<IActionResult> Index(string? category, string? sortOrder, string? search, int page = 1)
         {
             if (page < 1) page = 1;
 
@@ -28,11 +28,17 @@ namespace furniture_store.Controllers
             ViewData["Categories"] = categories;
             ViewData["CurrentCategory"] = category;
             ViewData["CurrentSort"] = sortOrder;
+            ViewData["CurrentSearch"] = search;
 
             IQueryable<Product> query = _context.Products.Include(p => p.Category);
             if (!string.IsNullOrEmpty(category))
             {
                 query = query.Where(p => p.Category != null && p.Category.Slug == category);
+            }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Name.Contains(search));
             }
 
             int totalItems = await query.CountAsync();
